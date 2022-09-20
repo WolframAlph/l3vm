@@ -7,13 +7,12 @@
 
 #define AVAILABLE_MEMORY (1 << 16)
 
-struct termios original_tio;
-void disable_input_buffering()
+void stdin_buffering_off()
 {
-    tcgetattr(STDIN_FILENO, &original_tio);
-    struct termios new_tio = original_tio;
-    new_tio.c_lflag &= ~ICANON & ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
+    struct termios term;
+    tcgetattr(STDIN_FILENO, &term);
+    term.c_lflag &= ~ICANON & ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
 enum TrapCode {
@@ -138,7 +137,7 @@ int main(int argc, char **argv)
     uint16_t PC = read_img(argv[1]);
     char run = 1;
 
-    disable_input_buffering();
+    stdin_buffering_off();
 
     while (run)
     {
