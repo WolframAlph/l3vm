@@ -1,9 +1,20 @@
 #include <stdio.h>
-#include "stdlib.h"
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <stdint.h>
+#include "termios.h"
+#include "unistd.h"
 
 #define AVAILABLE_MEMORY (1 << 16)
+
+struct termios original_tio;
+void disable_input_buffering()
+{
+    tcgetattr(STDIN_FILENO, &original_tio);
+    struct termios new_tio = original_tio;
+    new_tio.c_lflag &= ~ICANON & ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
+}
 
 enum TrapCode {
     GETC,
@@ -126,6 +137,8 @@ int main(int argc, char **argv)
 {
     uint16_t PC = read_img(argv[1]);
     char run = 1;
+
+    disable_input_buffering();
 
     while (run)
     {
