@@ -74,8 +74,8 @@ def tokenize(path):
                             columno += 1
                             if line[columno] == "n":
                                 string += "\n"
-                            else:
-                                string += "e"
+                            elif line[columno] == "e":
+                                string += "\x1b"
                             columno += 1
                         else:
                             string += line[columno]
@@ -280,7 +280,7 @@ def third_argument_numer_validator(tokline: List[Token]):
 
 def is_asm_number(token: Token):
     num = token.value
-    return num.startswith("x") or num.startswith("#")
+    return num.startswith("x") or num.startswith("#") or num.startswith("X")
 
 
 def parse_asm_number(tok: Token) -> int:
